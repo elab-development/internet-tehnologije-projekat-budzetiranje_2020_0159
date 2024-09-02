@@ -41,4 +41,15 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+     // Korisnik može imati više troškova
+     public function expenses()
+     {
+         return $this->hasMany(Expense::class);
+     }
+ 
+     // Korisnik može imati više plaćanja (refundacija)
+     public function payments()
+     {
+         return $this->hasMany(Payment::class);
+     }
 }
