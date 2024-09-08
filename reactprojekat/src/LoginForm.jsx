@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './LoginForm.css';
 
-const LoginForm = () => {
+const LoginForm = ({ setToken, setUser }) => {
   const [formData, setFormData] = useState({ email: 'user@example.com', password: 'password' });
   const [error, setError] = useState(null);
   const navigate = useNavigate();
@@ -24,6 +24,10 @@ const LoginForm = () => {
       // Save token and user data to session storage
       sessionStorage.setItem('auth_token', access_token);
       sessionStorage.setItem('user', JSON.stringify(user));
+
+      // Set the token and user in the App state using props
+      setToken(access_token);
+      setUser(user);
 
       // Navigate to a dashboard or homepage after successful login
       navigate('/dashboard');
