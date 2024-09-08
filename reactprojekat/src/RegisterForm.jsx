@@ -1,8 +1,8 @@
-// RegisterForm.js
+
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import FormInput from './FormInput';  // Import the new reusable component
+import FormInput from './FormInput'; 
 import './RegisterForm.css';
 
 const RegisterForm = () => {
@@ -26,10 +26,7 @@ const RegisterForm = () => {
     e.preventDefault();
     try {
       const response = await axios.post('http://127.0.0.1:8000/api/register', formData);
-      const { access_token, user } = response.data;
-
-      sessionStorage.setItem('auth_token', access_token);
-      sessionStorage.setItem('user', JSON.stringify(user));
+   
 
       navigate('/login');
     } catch (err) {

@@ -6,23 +6,18 @@ use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\IncomeController;
 use App\Http\Controllers\PaymentController;
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
-|
-*/
+use App\Http\Controllers\UserController;
+ 
 
+ 
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
 Route::middleware('auth:sanctum')->group(function () {
+
+    Route::get('/users', [UserController::class, 'index']); // Route to fetch all users
     Route::get('/payments', [PaymentController::class, 'index']);
     Route::get('/payments/{id}', [PaymentController::class, 'show']);
     Route::post('/payments', [PaymentController::class, 'store']);

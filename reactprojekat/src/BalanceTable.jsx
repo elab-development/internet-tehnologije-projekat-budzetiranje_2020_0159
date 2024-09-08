@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import useExpenses from './useExpenses';
 import usePayments from './usePayments';
 import useIncomes from './useIncomes';
+import useUsers from './useUsers'; // Add the hook to fetch users
 import TransactionCard from './TransactionCard';
 import './BalanceTable.css';
 import axios from 'axios';
@@ -10,6 +11,7 @@ const BalanceTable = () => {
   const { expenses, setExpenses, loading: loadingExpenses, error: errorExpenses } = useExpenses();
   const { payments, setPayments, loading: loadingPayments, error: errorPayments } = usePayments();
   const { incomes, setIncomes, loading: loadingIncomes, error: errorIncomes } = useIncomes();
+  const { users, loading: loadingUsers, error: errorUsers } = useUsers(); // Use the hook to get users
 
   const [newExpense, setNewExpense] = useState({
     amount: '',
@@ -101,10 +103,10 @@ const BalanceTable = () => {
   const totalExpenses = expenses.reduce((total, expense) => total + (Number(expense.amount) || 0), 0);
   const totalPayments = payments.reduce((total, payment) => total + (payment.status === 'completed' ? (Number(payment.amount) || 0) : 0), 0);
   const totalIncomes = incomes.reduce((total, income) => total + (income.status === 'completed' ? (Number(income.amount) || 0) : 0), 0);
-  const finalBalance = totalIncomes + totalPayments - totalExpenses;
+  const finalBalance = totalIncomes - totalPayments - totalExpenses;
 
-  if (loadingExpenses || loadingPayments || loadingIncomes) return <p>Loading...</p>;
-  if (errorExpenses || errorPayments || errorIncomes) return <p>Error loading data.</p>;
+  if (loadingExpenses || loadingPayments || loadingIncomes || loadingUsers) return <p>Loading...</p>;
+  if (errorExpenses || errorPayments || errorIncomes || errorUsers) return <p>Error loading data.</p>;
 
   return (
     <div className="balance-table-container">
@@ -191,7 +193,15 @@ const BalanceTable = () => {
             <span className="close" onClick={() => setShowPaymentModal(false)}>&times;</span>
             <h2>Create New Payment</h2>
             <form onSubmit={submitPayment}>
-              <input type="text" name="payee_id" placeholder="Payee ID" value={newPayment.payee_id} onChange={handlePaymentChange} required />
+              {/* Select Dropdown for Payee */}
+              <select name="payee_id" value={newPayment.payee_id} onChange={handlePaymentChange} required>
+                <option value="">Select Payee</option>
+                {users.map((user) => (
+                  <option key={user.id} value={user.id}>
+                    {user.name}
+                  </option>
+                ))}
+              </select>
               <input type="number" name="amount" placeholder="Amount" value={newPayment.amount} onChange={handlePaymentChange} required />
               <select name="status" value={newPayment.status} onChange={handlePaymentChange}>
                 <option value="pending">Pending</option>

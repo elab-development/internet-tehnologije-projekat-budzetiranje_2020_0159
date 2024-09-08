@@ -9,13 +9,11 @@ use Illuminate\Support\Facades\Auth;
 
 class PaymentController extends Controller
 {
-    // Prikaz svih plaćanja za ulogovanog korisnika (kao payer ili payee)
+    // Prikaz svih plaćanja za ulogovanog korisnika 
     public function index()
     {
         $user = Auth::user();
-        $payments = Payment::where('payer_id', $user->id)
-                            ->orWhere('payee_id', $user->id)
-                            ->get();
+        $payments = Payment::where('payer_id', $user->id)->get();
         return response()->json($payments);
     }
 

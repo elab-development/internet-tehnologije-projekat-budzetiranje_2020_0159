@@ -13,7 +13,7 @@ class IncomeController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $incomes = Income::where('sender_id', $user->id)->orWhereNull('sender_id')->get();
+        $incomes = Income::where('receiver_id', $user->id)->get();
         return response()->json($incomes);
     }
 
@@ -39,7 +39,11 @@ class IncomeController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
-        $income = Income::create($request->all());
+        // Dodajemo receiver_id kao id ulogovanog korisnika
+        $incomeData = $request->all();
+        $incomeData['receiver_id'] =  Auth::user()->id;;  // Dodajemo receiver_id
+      //  return $incomeData;
+        $income = Income::create($incomeData);
 
         return response()->json($income, 201);
     }
@@ -61,6 +65,7 @@ class IncomeController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
+        // Ažuriramo receiver_id ako je potrebno (ali u ovom slučaju, ne menjamo receiver_id jer je već postavljen)
         $income->update($request->all());
 
         return response()->json($income);
