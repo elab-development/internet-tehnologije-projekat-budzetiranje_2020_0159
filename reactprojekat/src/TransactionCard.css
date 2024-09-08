@@ -1,0 +1,31 @@
+.transaction-card {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    position: relative; /* Dodajemo relative za pozicioniranje statusa */
+  }
+  
+  .transaction-card h3 {
+    font-size: 1.2rem;
+    color: #4e6e58;
+  }
+  
+  .transaction-card p {
+    font-size: 1rem;
+    color: #544b3d;
+  }
+  
+  /* Stil za status u gornjem desnom uglu */
+  .transaction-card .status {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background-color: #4c8577; /* Dodajemo pozadinsku boju */
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 0.9rem;
+  }
+  

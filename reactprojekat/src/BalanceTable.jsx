@@ -1,6 +1,7 @@
 import React from 'react';
 import useExpenses from './useExpenses';
 import usePayments from './usePayments';
+import TransactionCard from './TransactionCard';
 import './BalanceTable.css';
 
 const BalanceTable = () => {
@@ -8,13 +9,19 @@ const BalanceTable = () => {
   const { payments, loading: loadingPayments, error: errorPayments } = usePayments();
 
   // Izračunavanje krajnjeg bilansa
-  const totalExpenses = expenses.reduce((total, expense) => total + expense.amount, 0);
+  const totalExpenses = expenses.reduce((total, expense) => {
+    const amount = Number(expense.amount) || 0; // Ensure amount is a number
+    return total + amount;
+  }, 0);
+
   const totalPayments = payments.reduce((total, payment) => {
     if (payment.status === 'completed') {
-      return total + payment.amount;
+      const amount = Number(payment.amount) || 0; // Ensure amount is a number
+      return total + amount;
     }
     return total;
   }, 0);
+
   const finalBalance = totalPayments - totalExpenses;
 
   if (loadingExpenses || loadingPayments) return <p>Loading...</p>;
@@ -24,39 +31,35 @@ const BalanceTable = () => {
   return (
     <div className="balance-table-container">
       <h1>Your Expenses and Payments</h1>
-      <table className="balance-table">
-        <thead>
-          <tr>
-            <th>Expenses</th>
-            <th>Payments</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>
-              <ul>
-                {expenses.map((expense) => (
-                  <li key={expense.id}>
-                    {expense.category} - {expense.amount} RSD ({expense.date})
-                  </li>
-                ))}
-              </ul>
-            </td>
-            <td>
-              <ul>
-                {payments.map((payment) => (
-                  <li key={payment.id}>
-                    Payment {payment.id} - {payment.amount} RSD ({payment.status})
-                  </li>
-                ))}
-              </ul>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div className="cards-container">
+        <div className="expenses-container">
+          <h2>Expenses</h2>
+          {expenses.map((expense) => (
+            <TransactionCard
+              key={expense.id}
+              title={expense.category}
+              amount={Number(expense.amount)}
+              date={expense.created_at} // Koristimo `created_at` za datum
+            />
+          ))}
+        </div>
+
+        <div className="payments-container">
+          <h2>Payments</h2>
+          {payments.map((payment) => (
+            <TransactionCard
+              key={payment.id}
+              title={`Payment ${payment.id}`}
+              amount={Number(payment.amount)}
+              date={payment.created_at} // Koristimo `created_at` za datum
+              status={payment.status}
+            />
+          ))}
+        </div>
+      </div>
 
       <div className="final-balance">
-        <h2>Final Balance: {finalBalance >= 0 ? `${finalBalance} RSD` : `- ${Math.abs(finalBalance)} RSD`}</h2>
+        <h2>Final Balance: {finalBalance >= 0 ? `${finalBalance.toFixed(2)} RSD` : `- ${Math.abs(finalBalance).toFixed(2)} RSD`}</h2>
       </div>
     </div>
   );

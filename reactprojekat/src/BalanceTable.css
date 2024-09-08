@@ -46,4 +46,18 @@
   .final-balance h2 {
     color: #4c8577;
   }
+  .balance-table-container {
+    padding: 20px;
+    background-color: #f7f7f7;
+    border-radius: 8px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .final-balance {
+    margin-top: 40px;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
   
