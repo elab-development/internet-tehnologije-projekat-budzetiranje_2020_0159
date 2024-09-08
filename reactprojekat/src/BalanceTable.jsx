@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import useExpenses from './useExpenses';
 import usePayments from './usePayments';
 import TransactionCard from './TransactionCard';
@@ -7,6 +7,9 @@ import './BalanceTable.css';
 const BalanceTable = () => {
   const { expenses, loading: loadingExpenses, error: errorExpenses } = useExpenses();
   const { payments, loading: loadingPayments, error: errorPayments } = usePayments();
+
+  // State za sortiranje
+  const [sortOrder, setSortOrder] = useState('asc'); // 'asc' za najstarije, 'desc' za najnovije
 
   // Izračunavanje krajnjeg bilansa
   const totalExpenses = expenses.reduce((total, expense) => {
@@ -24,17 +27,43 @@ const BalanceTable = () => {
 
   const finalBalance = totalPayments - totalExpenses;
 
+  // Funkcija za sortiranje po datumu
+  const sortByDate = (array) => {
+    return array.sort((a, b) => {
+      const dateA = new Date(a.created_at);
+      const dateB = new Date(b.created_at);
+
+      if (sortOrder === 'asc') {
+        return dateA - dateB;
+      } else {
+        return dateB - dateA;
+      }
+    });
+  };
+
+  const sortedExpenses = sortByDate([...expenses]);
+  const sortedPayments = sortByDate([...payments]);
+
+  // Funkcija za promenu redosleda sortiranja
+  const toggleSortOrder = () => {
+    setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+  };
+
   if (loadingExpenses || loadingPayments) return <p>Loading...</p>;
   if (errorExpenses) return <p>{errorExpenses}</p>;
   if (errorPayments) return <p>{errorPayments}</p>;
 
   return (
     <div className="balance-table-container">
-      <h1>Your Expenses and Payments</h1>
+      <h1>Dashboard</h1>
+      <button className="sort-button" onClick={toggleSortOrder}>
+        Sort by Date ({sortOrder === 'asc' ? 'Oldest First' : 'Newest First'})
+      </button>
+
       <div className="cards-container">
         <div className="expenses-container">
           <h2>Expenses</h2>
-          {expenses.map((expense) => (
+          {sortedExpenses.map((expense) => (
             <TransactionCard
               key={expense.id}
               title={expense.category}
@@ -46,7 +75,7 @@ const BalanceTable = () => {
 
         <div className="payments-container">
           <h2>Payments</h2>
-          {payments.map((payment) => (
+          {sortedPayments.map((payment) => (
             <TransactionCard
               key={payment.id}
               title={`Payment ${payment.id}`}
