@@ -14,7 +14,7 @@
     color: var(--dark-brown);
   }
   
-  .login-container {
+  .register-container {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -22,7 +22,7 @@
     background-color: var(--light-teal);
   }
   
-  .login-form-section {
+  .register-form-section {
     background-color: var(--olive-green);
     padding: 40px;
     border-radius: 10px;
@@ -32,7 +32,7 @@
     text-align: center;
   }
   
-  .login-form-section h1 {
+  .register-form-section h1 {
     font-size: 2rem;
     margin-bottom: 20px;
   }

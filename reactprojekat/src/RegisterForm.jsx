@@ -1,13 +1,18 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import './LoginForm.css';
+import './RegisterForm.css';
 
-const LoginForm = () => {
-  const [formData, setFormData] = useState({ email: 'user@example.com', password: 'password' });
+const RegisterForm = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    password_confirmation: ''
+  });
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-
+ 
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -18,26 +23,40 @@ const LoginForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/login', formData);
+      const response = await axios.post('http://127.0.0.1:8000/api/register', formData);
       const { access_token, user } = response.data;
 
       // Save token and user data to session storage
       sessionStorage.setItem('auth_token', access_token);
       sessionStorage.setItem('user', JSON.stringify(user));
 
-      // Navigate to a dashboard or homepage after successful login
-      navigate('/dashboard');
+     
+      navigate('/login');
     } catch (err) {
-      setError('Invalid login credentials');
+      if (err.response && err.response.data) {
+        setError(Object.values(err.response.data).flat().join(', '));  // Prikazuje greške validacije
+      } else {
+        setError('Registration failed. Please check your input.');
+      }
     }
   };
 
   return (
-    <div className="login-container">
-      <div className="login-form-section">
-        <h1>Login</h1>
+    <div className="register-container">
+      <div className="register-form-section">
+        <h1>Register</h1>
         {error && <p className="error-message">{error}</p>}
         <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label>Name:</label>
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+            />
+          </div>
           <div className="form-group">
             <label>Email:</label>
             <input
@@ -58,11 +77,21 @@ const LoginForm = () => {
               required
             />
           </div>
-          <button type="submit" className="cta-button">Login</button>
+          <div className="form-group">
+            <label>Confirm Password:</label>
+            <input
+              type="password"
+              name="password_confirmation"
+              value={formData.password_confirmation}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <button type="submit" className="cta-button">Register</button>
         </form>
       </div>
     </div>
   );
 };
 
-export default LoginForm;
+export default RegisterForm;
