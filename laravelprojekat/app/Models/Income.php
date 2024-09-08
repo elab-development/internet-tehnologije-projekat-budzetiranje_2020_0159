@@ -9,7 +9,7 @@ class Income extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['date', 'category', 'status', 'sender_id'];
+    protected $fillable = ['date', 'category','amount' ,'status', 'sender_id'];
 
     
     public function sender()

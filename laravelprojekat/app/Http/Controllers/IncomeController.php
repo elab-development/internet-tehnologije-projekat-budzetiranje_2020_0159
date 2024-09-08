@@ -31,7 +31,8 @@ class IncomeController extends Controller
             'date' => 'required|date',
             'category' => 'required|string|max:255',
             'status' => 'required|string|in:pending,completed',
-            'sender_id' => 'nullable|exists:users,id'
+            'sender_id' => 'nullable|exists:users,id',
+            'amount' => 'required|numeric|min:0',
         ]);
 
         if ($validator->fails()) {
@@ -52,7 +53,8 @@ class IncomeController extends Controller
             'date' => 'required|date',
             'category' => 'required|string|max:255',
             'status' => 'required|string|in:pending,completed',
-            'sender_id' => 'nullable|exists:users,id'
+            'sender_id' => 'nullable|exists:users,id',
+            'amount' => 'required|numeric|min:0',
         ]);
 
         if ($validator->fails()) {

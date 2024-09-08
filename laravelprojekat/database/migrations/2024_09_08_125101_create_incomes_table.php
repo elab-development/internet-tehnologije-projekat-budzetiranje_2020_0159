@@ -20,6 +20,7 @@ class CreateIncomesTable extends Migration
             $table->string('status'); // Status (npr. 'pending', 'completed')
             $table->unsignedBigInteger('sender_id')->nullable(); // ID osobe koja šalje novac, nullable
             $table->foreign('sender_id')->references('id')->on('users')->onDelete('set null'); // Spoljni ključ ka korisnicima
+            $table->decimal('amount', 10, 2);
             $table->timestamps();
         });
     }
