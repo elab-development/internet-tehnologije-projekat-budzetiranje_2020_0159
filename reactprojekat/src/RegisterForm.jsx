@@ -1,6 +1,8 @@
+// RegisterForm.js
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import FormInput from './FormInput';  // Import the new reusable component
 import './RegisterForm.css';
 
 const RegisterForm = () => {
@@ -12,7 +14,7 @@ const RegisterForm = () => {
   });
   const [error, setError] = useState(null);
   const navigate = useNavigate();
- 
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -26,15 +28,13 @@ const RegisterForm = () => {
       const response = await axios.post('http://127.0.0.1:8000/api/register', formData);
       const { access_token, user } = response.data;
 
-      // Save token and user data to session storage
       sessionStorage.setItem('auth_token', access_token);
       sessionStorage.setItem('user', JSON.stringify(user));
 
-     
       navigate('/login');
     } catch (err) {
       if (err.response && err.response.data) {
-        setError(Object.values(err.response.data).flat().join(', '));  // Prikazuje greške validacije
+        setError(Object.values(err.response.data).flat().join(', '));
       } else {
         setError('Registration failed. Please check your input.');
       }
@@ -47,46 +47,34 @@ const RegisterForm = () => {
         <h1>Register</h1>
         {error && <p className="error-message">{error}</p>}
         <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>Name:</label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label>Email:</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label>Password:</label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label>Confirm Password:</label>
-            <input
-              type="password"
-              name="password_confirmation"
-              value={formData.password_confirmation}
-              onChange={handleChange}
-              required
-            />
-          </div>
+          <FormInput
+            label="Name:"
+            type="text"
+            name="name"
+            value={formData.name}
+            handleChange={handleChange}
+          />
+          <FormInput
+            label="Email:"
+            type="email"
+            name="email"
+            value={formData.email}
+            handleChange={handleChange}
+          />
+          <FormInput
+            label="Password:"
+            type="password"
+            name="password"
+            value={formData.password}
+            handleChange={handleChange}
+          />
+          <FormInput
+            label="Confirm Password:"
+            type="password"
+            name="password_confirmation"
+            value={formData.password_confirmation}
+            handleChange={handleChange}
+          />
           <button type="submit" className="cta-button">Register</button>
         </form>
       </div>
