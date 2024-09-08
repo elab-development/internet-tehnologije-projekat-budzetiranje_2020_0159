@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\IncomeController;
 use App\Http\Controllers\PaymentController;
 /*
 |--------------------------------------------------------------------------
@@ -35,6 +36,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/expenses', [ExpenseController::class, 'store']);
     Route::put('/expenses/{id}', [ExpenseController::class, 'update']);
     Route::delete('/expenses/{id}', [ExpenseController::class, 'destroy']);
+
+
+    Route::get('/incomes', [IncomeController::class, 'index']);
+    Route::get('/incomes/{id}', [IncomeController::class, 'show']);
+    Route::post('/incomes', [IncomeController::class, 'store']);
+    Route::put('/incomes/{id}', [IncomeController::class, 'update']);
+    Route::delete('/incomes/{id}', [IncomeController::class, 'destroy']);
 });
 
 

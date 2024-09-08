@@ -10,7 +10,7 @@ class Payment extends Model
     use HasFactory;
 
     protected $fillable = [
-        'expense_id',   // ID troška
+       
         'payer_id',     // ID korisnika koji plaća
         'payee_id',     // ID korisnika kome se plaća
         'amount',       // Iznos plaćanja

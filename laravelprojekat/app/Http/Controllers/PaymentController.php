@@ -30,8 +30,6 @@ class PaymentController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'expense_id' => 'required|exists:expenses,id',
-            'payer_id' => 'required|exists:users,id',
             'payee_id' => 'required|exists:users,id',
             'amount' => 'required|numeric|min:0',
             'status' => 'required|string|in:pending,completed',
@@ -41,7 +39,13 @@ class PaymentController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
-        $payment = Payment::create($request->all());
+        // Koristimo ID ulogovanog korisnika kao `payer_id`
+        $payment = Payment::create([
+            'payer_id' => Auth::id(),
+            'payee_id' => $request->payee_id,
+            'amount' => $request->amount,
+            'status' => $request->status,
+        ]);
 
         return response()->json($payment, 201);
     }
@@ -52,8 +56,6 @@ class PaymentController extends Controller
         $payment = Payment::findOrFail($id);
 
         $validator = Validator::make($request->all(), [
-            'expense_id' => 'required|exists:expenses,id',
-            'payer_id' => 'required|exists:users,id',
             'payee_id' => 'required|exists:users,id',
             'amount' => 'required|numeric|min:0',
             'status' => 'required|string|in:pending,completed',
@@ -63,7 +65,13 @@ class PaymentController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
-        $payment->update($request->all());
+        // Ažuriramo polja sa ID ulogovanog korisnika kao `payer_id`
+        $payment->update([
+            'payer_id' => Auth::id(),
+            'payee_id' => $request->payee_id,
+            'amount' => $request->amount,
+            'status' => $request->status,
+        ]);
 
         return response()->json($payment);
     }

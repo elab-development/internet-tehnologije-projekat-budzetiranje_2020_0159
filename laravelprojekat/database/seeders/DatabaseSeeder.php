@@ -62,7 +62,7 @@ class DatabaseSeeder extends Seeder
         // Seed for payments table
         DB::table('payments')->insert([
             [
-                'expense_id' => 1, // ID of first expense
+               
                 'payer_id' => 1,    // Admin User is paying
                 'payee_id' => 2,    // Regular User is receiving the payment
                 'amount' => 25.00,
@@ -71,7 +71,7 @@ class DatabaseSeeder extends Seeder
                 'updated_at' => Carbon::now(),
             ],
             [
-                'expense_id' => 2, // ID of second expense
+               
                 'payer_id' => 2,   // Regular User is paying
                 'payee_id' => 1,   // Admin User is receiving the payment
                 'amount' => 10.00,

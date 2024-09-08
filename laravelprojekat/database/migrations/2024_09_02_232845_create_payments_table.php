@@ -14,15 +14,14 @@ class CreatePaymentsTable extends Migration
     {
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('expense_id');
+            
             $table->unsignedBigInteger('payer_id');
             $table->unsignedBigInteger('payee_id');
             $table->decimal('amount', 10, 2);
             $table->string('status')->default('pending');
             $table->timestamps();
 
-            // Dodavanje spoljnih ključeva
-            $table->foreign('expense_id')->references('id')->on('expenses')->onDelete('cascade');
+           
             $table->foreign('payer_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('payee_id')->references('id')->on('users')->onDelete('cascade');
         });
