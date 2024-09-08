@@ -26,7 +26,7 @@ const usePayments = () => {
     fetchPayments();
   }, []);
 
-  return { payments, loading, error };
+  return { payments,setPayments, loading, error };
 };
 
 export default usePayments;

@@ -22,10 +22,27 @@
     position: absolute;
     top: 10px;
     right: 15px;
-    background-color: #4c8577; /* Dodajemo pozadinsku boju */
+    background-color: #4c8577; /* Pozadinska boja */
     color: #fff;
     padding: 5px 10px;
     border-radius: 5px;
     font-size: 0.9rem;
+  }
+  
+  /* Stil za dugme za brisanje */
+  .delete-button {
+    position: absolute;
+    bottom: 10px;
+    right: 15px;
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 8px;
+    cursor: pointer;
+  }
+  
+  .delete-button:hover {
+    background-color: #c0392b;
   }
   

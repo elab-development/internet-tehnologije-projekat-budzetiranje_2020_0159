@@ -17,7 +17,9 @@ use App\Http\Controllers\PaymentController;
 */
 
 
-
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/payments', [PaymentController::class, 'index']);
@@ -25,17 +27,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/payments', [PaymentController::class, 'store']);
     Route::put('/payments/{id}', [PaymentController::class, 'update']);
     Route::delete('/payments/{id}', [PaymentController::class, 'destroy']);
-});
 
 
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
-Route::middleware('auth:sanctum')->group(function () {
     Route::get('/expenses', [ExpenseController::class, 'index']);
     Route::get('/expenses/{id}', [ExpenseController::class, 'show']);
     Route::post('/expenses', [ExpenseController::class, 'store']);
     Route::put('/expenses/{id}', [ExpenseController::class, 'update']);
     Route::delete('/expenses/{id}', [ExpenseController::class, 'destroy']);
 });
+
+
+
+ 

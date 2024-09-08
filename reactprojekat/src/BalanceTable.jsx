@@ -5,21 +5,30 @@ import TransactionCard from './TransactionCard';
 import './BalanceTable.css';
 
 const BalanceTable = () => {
-  const { expenses, loading: loadingExpenses, error: errorExpenses } = useExpenses();
-  const { payments, loading: loadingPayments, error: errorPayments } = usePayments();
+  const { expenses, setExpenses, loading: loadingExpenses, error: errorExpenses } = useExpenses();
+  const { payments, setPayments, loading: loadingPayments, error: errorPayments } = usePayments();
 
   // State za sortiranje
   const [sortOrder, setSortOrder] = useState('asc'); // 'asc' za najstarije, 'desc' za najnovije
 
+  // Funkcije za brisanje troška i plaćanja
+  const handleDeleteExpense = (id) => {
+    setExpenses(expenses.filter(expense => expense.id !== id));
+  };
+
+  const handleDeletePayment = (id) => {
+    setPayments(payments.filter(payment => payment.id !== id));
+  };
+
   // Izračunavanje krajnjeg bilansa
   const totalExpenses = expenses.reduce((total, expense) => {
-    const amount = Number(expense.amount) || 0; // Ensure amount is a number
+    const amount = Number(expense.amount) || 0;
     return total + amount;
   }, 0);
 
   const totalPayments = payments.reduce((total, payment) => {
     if (payment.status === 'completed') {
-      const amount = Number(payment.amount) || 0; // Ensure amount is a number
+      const amount = Number(payment.amount) || 0;
       return total + amount;
     }
     return total;
@@ -32,12 +41,7 @@ const BalanceTable = () => {
     return array.sort((a, b) => {
       const dateA = new Date(a.created_at);
       const dateB = new Date(b.created_at);
-
-      if (sortOrder === 'asc') {
-        return dateA - dateB;
-      } else {
-        return dateB - dateA;
-      }
+      return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
     });
   };
 
@@ -66,9 +70,12 @@ const BalanceTable = () => {
           {sortedExpenses.map((expense) => (
             <TransactionCard
               key={expense.id}
+              id={expense.id}
               title={expense.category}
               amount={Number(expense.amount)}
-              date={expense.created_at} // Koristimo `created_at` za datum
+              date={expense.created_at}
+              type="expense"
+              onDelete={handleDeleteExpense}
             />
           ))}
         </div>
@@ -78,10 +85,13 @@ const BalanceTable = () => {
           {sortedPayments.map((payment) => (
             <TransactionCard
               key={payment.id}
+              id={payment.id}
               title={`Payment ${payment.id}`}
               amount={Number(payment.amount)}
-              date={payment.created_at} // Koristimo `created_at` za datum
+              date={payment.created_at}
               status={payment.status}
+              type="payment"
+              onDelete={handleDeletePayment}
             />
           ))}
         </div>

@@ -26,7 +26,7 @@ const useExpenses = () => {
     fetchExpenses();
   }, []);
 
-  return { expenses, loading, error };
+  return { expenses, setExpenses,loading, error };
 };
 
 export default useExpenses;
