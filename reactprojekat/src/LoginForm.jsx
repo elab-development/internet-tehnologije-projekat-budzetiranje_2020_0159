@@ -27,9 +27,15 @@ const LoginForm = ({ setToken, setUser }) => {
       sessionStorage.setItem('user', JSON.stringify(user));
 
       setToken(access_token);
-      setUser(user);
+      setUser(user);  
+      if(response.data.user.role=="admin"){
+        navigate('/admindashboard');
+      }else{
+        navigate('/dashboard');
+      } 
 
-      navigate('/dashboard');
+
+     
     } catch (err) {
       setError('Invalid login credentials');
     }

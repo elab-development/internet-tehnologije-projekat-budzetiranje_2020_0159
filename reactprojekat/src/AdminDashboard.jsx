@@ -10,6 +10,7 @@ const AdminDashboard = () => {
   const [exchangeRates, setExchangeRates] = useState({}); // Storing exchange rates
   const [currentPage, setCurrentPage] = useState(1); // Current page for pagination
   const usersPerPage = 5; // Number of users per page
+  const CACHE_EXPIRY = 21600; // 6 hours in seconds
 
   useEffect(() => {
     const fetchUsersData = async () => {
@@ -70,16 +71,32 @@ const AdminDashboard = () => {
     fetchUsersData();
   }, []);
 
-  // Fetching exchange rates from an API
+  // Fetching exchange rates with caching (expires in 6 hours)
   useEffect(() => {
     const fetchExchangeRates = async () => {
-      try {
-        const response = await axios.get(
-          `https://v6.exchangerate-api.com/v6/97881401fc7e1ad5c8095cd5/latest/RSD`
-        );
-        setExchangeRates(response.data.conversion_rates);
-      } catch (error) {
-        console.error('Failed to fetch exchange rates:', error);
+      const cachedRates = JSON.parse(localStorage.getItem('exchangeRates'));
+      const lastFetchTime = localStorage.getItem('exchangeRatesTimestamp');
+
+      const now = Math.floor(Date.now() / 1000); // current time in seconds
+
+      if (cachedRates && lastFetchTime && now - lastFetchTime < CACHE_EXPIRY) {
+        // Use cached rates if they are less than 6 hours old
+        setExchangeRates(cachedRates);
+      } else {
+        try {
+          const response = await axios.get(
+            `https://v6.exchangerate-api.com/v6/97881401fc7e1ad5c8095cd5/latest/RSD`
+          );
+          const rates = response.data.conversion_rates;
+
+          // Store exchange rates in localStorage
+          localStorage.setItem('exchangeRates', JSON.stringify(rates));
+          localStorage.setItem('exchangeRatesTimestamp', now.toString()); // Store current timestamp
+
+          setExchangeRates(rates);
+        } catch (error) {
+          console.error('Failed to fetch exchange rates:', error);
+        }
       }
     };
 

@@ -24,7 +24,7 @@ function App() {
   return (
     <div className="App">
       <BrowserRouter>
-        <Navbar token={token} setToken={setToken} setUser={setUser} /> 
+        <Navbar token={token} setToken={setToken} setUser={setUser}  user={user}/> 
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginForm setToken={setToken} setUser={setUser} />} />
