@@ -12,6 +12,7 @@ const BalanceTable = () => {
   const { payments, setPayments, loading: loadingPayments, error: errorPayments } = usePayments();
   const { incomes, setIncomes, loading: loadingIncomes, error: errorIncomes } = useIncomes();
   const { users, loading: loadingUsers, error: errorUsers } = useUsers(); // Use the hook to get users
+  const [searchQuery, setSearchQuery] = useState('');
 
   const [newExpense, setNewExpense] = useState({
     amount: '',
@@ -80,7 +81,20 @@ const BalanceTable = () => {
     }
   };
   
-
+  const filteredExpenses = expenses.filter((expense) =>
+    expense.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    expense.description?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  
+  const filteredPayments = payments.filter((payment) =>
+    users.find(user => user.id === payment.payee_id)?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    `Payment ${payment.id}`.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  
+  const filteredIncomes = incomes.filter((income) =>
+    income.category.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  
   // Submit or update expense
   const submitExpense = async (e) => {
     e.preventDefault();
@@ -180,11 +194,18 @@ const BalanceTable = () => {
       <button className="sort-button" onClick={toggleSortOrder}>
         Sort by Date ({sortOrder === 'asc' ? 'Oldest First' : 'Newest First'})
       </button>
+      <input 
+        type="text" 
+        placeholder="Search..." 
+        value={searchQuery} 
+        onChange={(e) => setSearchQuery(e.target.value)} 
+        className="search-input" 
+      />
 
       <div className="cards-container">
         <div className="expenses-container">
           <h2>Expenses</h2>
-          {sortedExpenses.map((expense) => (
+          {filteredExpenses.map((expense) => (
             <TransactionCard
               key={expense.id}
               id={expense.id}
@@ -200,7 +221,7 @@ const BalanceTable = () => {
 
         <div className="payments-container">
           <h2>Payments</h2>
-          {sortedPayments.map((payment) => (
+          {filteredPayments.map((payment) => (
             <TransactionCard
               key={payment.id}
               id={payment.id}
@@ -217,7 +238,7 @@ const BalanceTable = () => {
 
         <div className="incomes-container">
           <h2>Incomes</h2>
-          {sortedIncomes.map((income) => (
+          {filteredIncomes.map((income) => (
             <TransactionCard
               key={income.id}
               id={income.id}
