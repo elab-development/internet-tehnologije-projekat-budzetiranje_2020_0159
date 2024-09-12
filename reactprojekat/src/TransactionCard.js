@@ -1,13 +1,12 @@
 import React from 'react';
 import axios from 'axios';
 import './TransactionCard.css';  
-import { FaTrash } from 'react-icons/fa'; // Import ikone kante
+import { FaTrash, FaPencilAlt } from 'react-icons/fa';  
 
-const TransactionCard = ({ id, title, amount, date, status, type, onDelete }) => {
+const TransactionCard = ({ id, title, amount, date, status, type, onDelete, onEdit }) => {
   const handleDelete = async () => {
     const token = sessionStorage.getItem('auth_token');
     try {
-      // Correct URL for DELETE request based on type
       let url = '';
       if (type === 'expense') {
         url = `http://127.0.0.1:8000/api/expenses/${id}`;
@@ -33,11 +32,13 @@ const TransactionCard = ({ id, title, amount, date, status, type, onDelete }) =>
     <div className="transaction-card">
       <h3>{title}</h3>
       <p>Amount: {amount.toFixed(2)} RSD</p>
-      {status && <p className="status">{status}</p>}  {/* Dodali smo klasu za status */}
+      {status && <p className="status">{status}</p>}
       <p>Date: {new Date(date).toLocaleDateString()}</p>
-      {/* Dugme za brisanje */}
       <button className="delete-button" onClick={handleDelete}>
-        <FaTrash /> {/* Ikona kantice */}
+        <FaTrash />
+      </button>
+      <button className="edit-button" onClick={() => onEdit(id, type)}>
+        <FaPencilAlt />
       </button>
     </div>
   );

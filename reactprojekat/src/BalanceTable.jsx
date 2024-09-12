@@ -37,57 +37,122 @@ const BalanceTable = () => {
   const [showExpenseModal, setShowExpenseModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showIncomeModal, setShowIncomeModal] = useState(false);
+  const [editExpense, setEditExpense] = useState(null);
+  const [editPayment, setEditPayment] = useState(null);
+  const [editIncome, setEditIncome] = useState(null);
 
   // Handle form input changes for new expenses, payments, and incomes
   const handleExpenseChange = (e) => setNewExpense({ ...newExpense, [e.target.name]: e.target.value });
   const handlePaymentChange = (e) => setNewPayment({ ...newPayment, [e.target.name]: e.target.value });
   const handleIncomeChange = (e) => setNewIncome({ ...newIncome, [e.target.name]: e.target.value });
 
-  // Submit new expense
+  // Funkcija za otvaranje modalnog prozora za ažuriranje
+  const onEdit = (id, type) => {
+    if (type === 'expense') {
+      const expenseToEdit = expenses.find((exp) => exp.id === id);
+      setEditExpense(expenseToEdit);
+      setNewExpense({
+        amount: expenseToEdit.amount,
+        date: expenseToEdit.date,
+        category: expenseToEdit.category,
+        description: expenseToEdit.description
+      });
+      setShowExpenseModal(true);
+    } else if (type === 'payment') {
+      const paymentToEdit = payments.find((pay) => pay.id === id);
+      setEditPayment(paymentToEdit);
+      setNewPayment({
+        payee_id: paymentToEdit.payee_id,
+        amount: paymentToEdit.amount,
+        status: paymentToEdit.status
+      });
+      setShowPaymentModal(true);
+    } else if (type === 'income') {
+      const incomeToEdit = incomes.find((inc) => inc.id === id);
+      setEditIncome(incomeToEdit);
+      setNewIncome({
+        category: incomeToEdit.category,
+        amount: incomeToEdit.amount,
+        date: incomeToEdit.date,
+        status: incomeToEdit.status
+      });
+      setShowIncomeModal(true);
+    }
+  };
+  
+
+  // Submit or update expense
   const submitExpense = async (e) => {
     e.preventDefault();
     const token = sessionStorage.getItem('auth_token');
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/expenses', newExpense, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setExpenses([...expenses, response.data]);
+      let response;
+      if (editExpense) {
+        response = await axios.put(`http://127.0.0.1:8000/api/expenses/${editExpense.id}`, newExpense, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setExpenses(expenses.map((exp) => (exp.id === editExpense.id ? response.data : exp)));
+        setEditExpense(null);
+      } else {
+        response = await axios.post('http://127.0.0.1:8000/api/expenses', newExpense, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setExpenses([...expenses, response.data]);
+      }
       setNewExpense({ amount: '', date: '', category: '', description: '' });
-      setShowExpenseModal(false); // Close modal after submission
+      setShowExpenseModal(false);
     } catch (error) {
-      console.error('Error creating expense:', error);
+      console.error('Error creating/updating expense:', error);
     }
   };
 
-  // Submit new payment
+  // Submit or update payment
   const submitPayment = async (e) => {
     e.preventDefault();
     const token = sessionStorage.getItem('auth_token');
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/payments', newPayment, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setPayments([...payments, response.data]);
+      let response;
+      if (editPayment) {
+        response = await axios.put(`http://127.0.0.1:8000/api/payments/${editPayment.id}`, newPayment, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setPayments(payments.map((pay) => (pay.id === editPayment.id ? response.data : pay)));
+        setEditPayment(null);
+      } else {
+        response = await axios.post('http://127.0.0.1:8000/api/payments', newPayment, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setPayments([...payments, response.data]);
+      }
       setNewPayment({ payee_id: '', amount: '', status: 'pending' });
-      setShowPaymentModal(false); // Close modal after submission
+      setShowPaymentModal(false);
     } catch (error) {
-      console.error('Error creating payment:', error);
+      console.error('Error creating/updating payment:', error);
     }
   };
 
-  // Submit new income
+  // Submit or update income
   const submitIncome = async (e) => {
     e.preventDefault();
     const token = sessionStorage.getItem('auth_token');
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/incomes', newIncome, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setIncomes([...incomes, response.data]);
+      let response;
+      if (editIncome) {
+        response = await axios.put(`http://127.0.0.1:8000/api/incomes/${editIncome.id}`, newIncome, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setIncomes(incomes.map((inc) => (inc.id === editIncome.id ? response.data : inc)));
+        setEditIncome(null);
+      } else {
+        response = await axios.post('http://127.0.0.1:8000/api/incomes', newIncome, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setIncomes([...incomes, response.data]);
+      }
       setNewIncome({ category: '', amount: '', date: '', status: 'pending' });
-      setShowIncomeModal(false); // Close modal after submission
+      setShowIncomeModal(false);
     } catch (error) {
-      console.error('Error creating income:', error);
+      console.error('Error creating/updating income:', error);
     }
   };
 
@@ -128,6 +193,7 @@ const BalanceTable = () => {
               date={expense.created_at}
               type="expense"
               onDelete={() => setExpenses(expenses.filter((exp) => exp.id !== expense.id))}
+              onEdit={() => onEdit(expense.id, 'expense')}
             />
           ))}
         </div>
@@ -144,6 +210,7 @@ const BalanceTable = () => {
               status={payment.status}
               type="payment"
               onDelete={() => setPayments(payments.filter((pay) => pay.id !== payment.id))}
+              onEdit={() => onEdit(payment.id, 'payment')}
             />
           ))}
         </div>
@@ -160,6 +227,7 @@ const BalanceTable = () => {
               status={income.status}
               type="income"
               onDelete={() => setIncomes(incomes.filter((inc) => inc.id !== income.id))}
+              onEdit={() => onEdit(income.id, 'income')}
             />
           ))}
         </div>
@@ -170,18 +238,18 @@ const BalanceTable = () => {
       <button onClick={() => setShowPaymentModal(true)}>Add Payment</button>
       <button onClick={() => setShowIncomeModal(true)}>Add Income</button>
 
-      {/* Modals for creating expenses, payments, and incomes */}
+      {/* Modals for creating/updating expenses, payments, and incomes */}
       {showExpenseModal && (
         <div className="modal">
           <div className="modal-content">
             <span className="close" onClick={() => setShowExpenseModal(false)}>&times;</span>
-            <h2>Create New Expense</h2>
+            <h2>{editExpense ? 'Edit Expense' : 'Create New Expense'}</h2>
             <form onSubmit={submitExpense}>
               <input type="text" name="category" placeholder="Category" value={newExpense.category} onChange={handleExpenseChange} required />
               <input type="number" name="amount" placeholder="Amount" value={newExpense.amount} onChange={handleExpenseChange} required />
               <input type="date" name="date" value={newExpense.date} onChange={handleExpenseChange} required />
               <textarea name="description" placeholder="Description" value={newExpense.description} onChange={handleExpenseChange} />
-              <button type="submit">Add Expense</button>
+              <button type="submit">{editExpense ? 'Update Expense' : 'Add Expense'}</button>
             </form>
           </div>
         </div>
@@ -191,9 +259,8 @@ const BalanceTable = () => {
         <div className="modal">
           <div className="modal-content">
             <span className="close" onClick={() => setShowPaymentModal(false)}>&times;</span>
-            <h2>Create New Payment</h2>
+            <h2>{editPayment ? 'Edit Payment' : 'Create New Payment'}</h2>
             <form onSubmit={submitPayment}>
-              {/* Select Dropdown for Payee */}
               <select name="payee_id" value={newPayment.payee_id} onChange={handlePaymentChange} required>
                 <option value="">Select Payee</option>
                 {users.map((user) => (
@@ -207,7 +274,7 @@ const BalanceTable = () => {
                 <option value="pending">Pending</option>
                 <option value="completed">Completed</option>
               </select>
-              <button type="submit">Add Payment</button>
+              <button type="submit">{editPayment ? 'Update Payment' : 'Add Payment'}</button>
             </form>
           </div>
         </div>
@@ -217,7 +284,7 @@ const BalanceTable = () => {
         <div className="modal">
           <div className="modal-content">
             <span className="close" onClick={() => setShowIncomeModal(false)}>&times;</span>
-            <h2>Create New Income</h2>
+            <h2>{editIncome ? 'Edit Income' : 'Create New Income'}</h2>
             <form onSubmit={submitIncome}>
               <input type="text" name="category" placeholder="Category" value={newIncome.category} onChange={handleIncomeChange} required />
               <input type="number" name="amount" placeholder="Amount" value={newIncome.amount} onChange={handleIncomeChange} required />
@@ -226,7 +293,7 @@ const BalanceTable = () => {
                 <option value="pending">Pending</option>
                 <option value="completed">Completed</option>
               </select>
-              <button type="submit">Add Income</button>
+              <button type="submit">{editIncome ? 'Update Income' : 'Add Income'}</button>
             </form>
           </div>
         </div>
