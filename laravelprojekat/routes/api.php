@@ -24,6 +24,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/payments/{id}', [PaymentController::class, 'update']);
     Route::delete('/payments/{id}', [PaymentController::class, 'destroy']);
 
+    Route::delete('/users/{id}', [UserController::class, 'destroy']);
 
 
     Route::get('/expenses', [ExpenseController::class, 'index']);

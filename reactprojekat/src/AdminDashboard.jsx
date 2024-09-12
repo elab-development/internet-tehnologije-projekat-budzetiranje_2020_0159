@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useTable, usePagination, useGlobalFilter } from 'react-table';
-import './AdminDashboard.css'; 
+import './AdminDashboard.css';
 
 const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [currency, setCurrency] = useState('RSD'); // Default valuta
-  const [exchangeRates, setExchangeRates] = useState({}); // Čuvamo kursnu listu
+  const [currency, setCurrency] = useState('RSD'); // Default currency
+  const [exchangeRates, setExchangeRates] = useState({}); // Storing exchange rates
+  const [currentPage, setCurrentPage] = useState(1); // Current page for pagination
+  const usersPerPage = 5; // Number of users per page
 
   useEffect(() => {
     const fetchUsersData = async () => {
@@ -69,7 +70,7 @@ const AdminDashboard = () => {
     fetchUsersData();
   }, []);
 
-  // Fetchovanje kursne liste iz API-ja
+  // Fetching exchange rates from an API
   useEffect(() => {
     const fetchExchangeRates = async () => {
       try {
@@ -86,68 +87,31 @@ const AdminDashboard = () => {
   }, []);
 
   const convertCurrency = (amount) => {
-    if (currency === 'RSD' || !exchangeRates[currency]) return amount; // Ako je valuta RSD, nema potrebe za konverzijom
-    return amount * exchangeRates[currency]; // Primena kursa
+    if (currency === 'RSD' || !exchangeRates[currency]) return amount; // If currency is RSD, no need for conversion
+    return amount * exchangeRates[currency]; // Apply exchange rate
   };
 
-  const data = React.useMemo(() => users, [users]);
+  // Function to delete a user
+  const deleteUser = async (userId) => {
+    const token = sessionStorage.getItem('auth_token');
+    try {
+      await axios.delete(`http://127.0.0.1:8000/api/users/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      // Remove the user from the local state
+      setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId));
+    } catch (err) {
+      console.error('Failed to delete user:', err);
+    }
+  };
 
-  const columns = React.useMemo(
-    () => [
-      {
-        Header: 'User',
-        accessor: 'name',
-      },
-      {
-        Header: 'Total Transactions',
-        accessor: 'totalTransactions',
-      },
-      {
-        Header: `Total Expenses (${currency})`,
-        accessor: 'totalExpenses',
-        Cell: ({ value }) => convertCurrency(value).toFixed(2),
-      },
-      {
-        Header: `Total Payments (${currency})`,
-        accessor: 'totalPayments',
-        Cell: ({ value }) => convertCurrency(value).toFixed(2),
-      },
-      {
-        Header: `Total Incomes (${currency})`,
-        accessor: 'totalIncomes',
-        Cell: ({ value }) => convertCurrency(value).toFixed(2),
-      },
-      {
-        Header: `Balance (${currency})`,
-        accessor: 'balance',
-        Cell: ({ value }) => convertCurrency(value).toFixed(2),
-      },
-    ],
-    [currency, exchangeRates]
-  );
+  // Get current users for pagination
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
 
-  const {
-    getTableProps,
-    getTableBodyProps,
-    headerGroups,
-    prepareRow,
-    page,
-    nextPage,
-    previousPage,
-    canNextPage,
-    canPreviousPage,
-    pageOptions,
-    setGlobalFilter,
-    state: { pageIndex, globalFilter },
-  } = useTable(
-    {
-      columns,
-      data,
-      initialState: { pageIndex: 0 },
-    },
-    useGlobalFilter,
-    usePagination
-  );
+  // Change page
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
@@ -156,7 +120,7 @@ const AdminDashboard = () => {
     <div>
       <h1>Admin Dashboard</h1>
 
-      {/* Odabir valute */}
+      {/* Currency selector */}
       <div className="currency-select">
         <label>Select Currency: </label>
         <select value={currency} onChange={(e) => setCurrency(e.target.value)}>
@@ -168,54 +132,45 @@ const AdminDashboard = () => {
         </select>
       </div>
 
-      {/* Globalni filter */}
-      <input
-        type="text"
-        value={globalFilter || ''}
-        onChange={(e) => setGlobalFilter(e.target.value)}
-        placeholder="Search users..."
-        className="search-input"
-      />
-
-      {/* Tabela sa paginacijom */}
-      <table {...getTableProps()} className="dashboard-table">
+      {/* Table */}
+      <table className="dashboard-table">
         <thead>
-          {headerGroups.map((headerGroup) => (
-            <tr {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map((column) => (
-                <th {...column.getHeaderProps()}>{column.render('Header')}</th>
-              ))}
+          <tr>
+            <th>User</th>
+            <th>Total Transactions</th>
+            <th>Total Expenses ({currency})</th>
+            <th>Total Payments ({currency})</th>
+            <th>Total Incomes ({currency})</th>
+            <th>Balance ({currency})</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {currentUsers.map((user) => (
+            <tr key={user.id}>
+              <td>{user.name}</td>
+              <td>{user.totalTransactions}</td>
+              <td>{convertCurrency(user.totalExpenses).toFixed(2)}</td>
+              <td>{convertCurrency(user.totalPayments).toFixed(2)}</td>
+              <td>{convertCurrency(user.totalIncomes).toFixed(2)}</td>
+              <td>{convertCurrency(user.balance).toFixed(2)}</td>
+              <td>
+                <button onClick={() => deleteUser(user.id)} className="delete-button">
+                  Delete
+                </button>
+              </td>
             </tr>
           ))}
-        </thead>
-        <tbody {...getTableBodyProps()}>
-          {page.map((row) => {
-            prepareRow(row);
-            return (
-              <tr {...row.getRowProps()}>
-                {row.cells.map((cell) => (
-                  <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
-                ))}
-              </tr>
-            );
-          })}
         </tbody>
       </table>
 
-      {/* Navigacija kroz paginaciju */}
+      {/* Pagination */}
       <div className="pagination">
-        <button onClick={() => previousPage()} disabled={!canPreviousPage}>
-          Previous
-        </button>
-        <span>
-          Page{' '}
-          <strong>
-            {pageIndex + 1} of {pageOptions.length}
-          </strong>
-        </span>
-        <button onClick={() => nextPage()} disabled={!canNextPage}>
-          Next
-        </button>
+        {Array.from({ length: Math.ceil(users.length / usersPerPage) }, (_, index) => (
+          <button key={index + 1} onClick={() => paginate(index + 1)} className={index + 1 === currentPage ? 'active' : ''}>
+            {index + 1}
+          </button>
+        ))}
       </div>
     </div>
   );
