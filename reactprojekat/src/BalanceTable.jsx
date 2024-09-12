@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import useExpenses from './useExpenses';
 import usePayments from './usePayments';
 import useIncomes from './useIncomes';
-import useUsers from './useUsers'; // Add the hook to fetch users
+import useUsers from './useUsers';  
 import TransactionCard from './TransactionCard';
 import './BalanceTable.css';
 import axios from 'axios';
-
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 const BalanceTable = () => {
   const { expenses, setExpenses, loading: loadingExpenses, error: errorExpenses } = useExpenses();
   const { payments, setPayments, loading: loadingPayments, error: errorPayments } = usePayments();
@@ -80,20 +81,7 @@ const BalanceTable = () => {
       setShowIncomeModal(true);
     }
   };
-  
-  const filteredExpenses = expenses.filter((expense) =>
-    expense.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    expense.description?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-  
-  const filteredPayments = payments.filter((payment) =>
-    users.find(user => user.id === payment.payee_id)?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    `Payment ${payment.id}`.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-  
-  const filteredIncomes = incomes.filter((income) =>
-    income.category.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+
   
   // Submit or update expense
   const submitExpense = async (e) => {
@@ -178,6 +166,22 @@ const BalanceTable = () => {
 
   const toggleSortOrder = () => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
 
+  
+  const filteredExpenses = sortedExpenses.filter((expense) =>
+    expense.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    expense.description?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  
+  const filteredPayments = sortedPayments.filter((payment) =>
+    users.find(user => user.id === payment.payee_id)?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    `Payment ${payment.id}`.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  
+  const filteredIncomes = sortedIncomes.filter((income) =>
+    income.category.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+
   // Izračunavanje bilansa
   const totalExpenses = expenses.reduce((total, expense) => total + (Number(expense.amount) || 0), 0);
   const totalPayments = payments.reduce((total, payment) => total + (payment.status === 'completed' ? (Number(payment.amount) || 0) : 0), 0);
@@ -186,11 +190,65 @@ const BalanceTable = () => {
 
   if (loadingExpenses || loadingPayments || loadingIncomes || loadingUsers) return <p>Loading...</p>;
   if (errorExpenses || errorPayments || errorIncomes || errorUsers) return <p>Error loading data.</p>;
+// Generisanje PDF izveštaja
+const generatePdf = () => {
+  const doc = new jsPDF();
+
+  const today = new Date().toLocaleDateString();
+  doc.text('Transaction Report', 14, 16);
+  doc.text(`Date: ${today}`, 14, 22);
+  doc.text(`Final Balance: ${finalBalance.toFixed(2)} RSD`, 14, 28);
+
+  // Prikazivanje troškova
+  doc.text('Expenses', 14, 34);
+  doc.autoTable({
+    startY: 38,
+    head: [['Category', 'Amount', 'Date', 'Description']],
+    body: filteredExpenses.map(expense => [
+      expense.category, 
+      `${Number(expense.amount).toFixed(2)} RSD`, 
+      new Date(expense.date).toLocaleDateString(), 
+      expense.description || ''
+    ])
+  });
+
+  // Prikazivanje plaćanja
+  doc.text('Payments', 14, doc.autoTable.previous.finalY + 10);
+  doc.autoTable({
+    startY: doc.autoTable.previous.finalY + 14,
+    head: [['Payee', 'Amount', 'Date', 'Status']],
+    body: filteredPayments.map(payment => [
+      users.find(user => user.id === payment.payee_id)?.name || 'Unknown',
+      `${Number(payment.amount).toFixed(2)} RSD`, 
+      new Date(payment.created_at).toLocaleDateString(), 
+      payment.status
+    ])
+  });
+
+  // Prikazivanje prihoda
+  doc.text('Incomes', 14, doc.autoTable.previous.finalY + 10);
+  doc.autoTable({
+    startY: doc.autoTable.previous.finalY + 14,
+    head: [['Category', 'Amount', 'Date', 'Status']],
+    body: filteredIncomes.map(income => [
+      income.category, 
+      `${Number(income.amount).toFixed(2)} RSD`, 
+      new Date(income.date).toLocaleDateString(), 
+      income.status
+    ])
+  });
+
+  // Preuzimanje PDF-a
+  doc.save(`Transaction_Report_${today}.pdf`);
+};
 
   return (
     <div className="balance-table-container">
       <h1>Dashboard</h1>
-
+    {/* Dugme za generisanje PDF-a */}
+    <button onClick={generatePdf} className="pdf-button">
+            Generate PDF Report
+          </button>
       <button className="sort-button" onClick={toggleSortOrder}>
         Sort by Date ({sortOrder === 'asc' ? 'Oldest First' : 'Newest First'})
       </button>
