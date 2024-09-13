@@ -83,4 +83,11 @@ class ExpenseController extends Controller
 
         return response()->json(['message' => 'Expense deleted successfully']);
     }
+    public function expensesByUserId($userId)
+    {
+        $expenses = Expense::where('paid_by', $userId)->get();
+       
+        return response()->json($expenses);
+    }
+
 }

@@ -23,19 +23,16 @@ const AdminDashboard = () => {
         const usersData = usersResponse.data;
 
         const transactionsPromises = usersData.map(async (user) => {
-          const expensesResponse = await axios.get(`http://127.0.0.1:8000/api/expenses`, {
+          const expensesResponse = await axios.get(`http://127.0.0.1:8000/api/expenses/user/${user.id}`, {
             headers: { Authorization: `Bearer ${token}` },
-            params: { paid_by: user.id },
           });
 
-          const paymentsResponse = await axios.get(`http://127.0.0.1:8000/api/payments`, {
+          const paymentsResponse = await axios.get(`http://127.0.0.1:8000/api/payments/user/${user.id}`, {
             headers: { Authorization: `Bearer ${token}` },
-            params: { payer_id: user.id },
           });
 
-          const incomesResponse = await axios.get(`http://127.0.0.1:8000/api/incomes`, {
+          const incomesResponse = await axios.get(`http://127.0.0.1:8000/api/incomes/receiver/${user.id}`, {
             headers: { Authorization: `Bearer ${token}` },
-            params: { receiver_id: user.id },
           });
 
           const expenses = expensesResponse.data;

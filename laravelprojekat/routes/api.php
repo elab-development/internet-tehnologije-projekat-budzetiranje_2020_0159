@@ -23,7 +23,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/payments', [PaymentController::class, 'store']);
     Route::put('/payments/{id}', [PaymentController::class, 'update']);
     Route::delete('/payments/{id}', [PaymentController::class, 'destroy']);
-
+    Route::get('/payments/user/{userId}', [PaymentController::class, 'paymentsByUserId']);
     Route::delete('/users/{id}', [UserController::class, 'destroy']);
 
 
@@ -32,6 +32,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/expenses', [ExpenseController::class, 'store']);
     Route::put('/expenses/{id}', [ExpenseController::class, 'update']);
     Route::delete('/expenses/{id}', [ExpenseController::class, 'destroy']);
+    Route::get('/expenses/user/{userId}', [ExpenseController::class, 'expensesByUserId']);
 
 
     Route::get('/incomes', [IncomeController::class, 'index']);
@@ -39,6 +40,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/incomes', [IncomeController::class, 'store']);
     Route::put('/incomes/{id}', [IncomeController::class, 'update']);
     Route::delete('/incomes/{id}', [IncomeController::class, 'destroy']);
+    Route::get('/incomes/receiver/{receiverId}', [IncomeController::class, 'incomesByReceiverId']);
 });
 
 

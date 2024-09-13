@@ -82,4 +82,12 @@ class PaymentController extends Controller
 
         return response()->json(['message' => 'Payment deleted successfully']);
     }
+    public function paymentsByUserId($userId)
+    {
+        $payments = Payment::where('payer_id', $userId)->get();
+ 
+
+        return response()->json($payments);
+    }
+
 }

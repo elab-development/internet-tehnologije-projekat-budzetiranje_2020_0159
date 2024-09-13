@@ -79,4 +79,12 @@ class IncomeController extends Controller
 
         return response()->json(['message' => 'Income deleted successfully']);
     }
+    public function incomesByReceiverId($receiverId)
+    {
+        $incomes = Income::where('receiver_id', $receiverId)->get();
+      
+
+        return response()->json($incomes);
+    }
+
 }
