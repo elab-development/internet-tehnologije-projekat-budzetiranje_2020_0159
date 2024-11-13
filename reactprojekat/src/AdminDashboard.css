@@ -1,0 +1,121 @@
+ 
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+  }
+  
+  h1 {
+    text-align: center;
+    margin: 20px 0;
+    color: #333;
+  }
+  
+  .currency-select {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+  }
+  
+  .currency-select label {
+    margin-right: 10px;
+    font-weight: bold;
+  }
+  
+  .currency-select select {
+    padding: 8px;
+    font-size: 14px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+  }
+  
+  .dashboard-table {
+    width: 80%;
+    margin: 0 auto;
+    border-collapse: collapse;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .dashboard-table th, .dashboard-table td {
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #ddd;
+  }
+  
+  .dashboard-table th {
+    background-color: #f7f7f7;
+    font-weight: bold;
+  }
+  
+  .dashboard-table td {
+    background-color: #f9f9f9;
+  }
+  
+  .dashboard-table tbody tr:nth-child(even) {
+    background-color: #f1f1f1;
+  }
+  
+  .delete-button {
+    padding: 6px 12px;
+    color: #fff;
+    background-color: #ff4d4d;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .delete-button:hover {
+    background-color: #e60000;
+  }
+  
+  .pagination {
+    text-align: center;
+    margin: 20px 0;
+  }
+  
+  .pagination button {
+    padding: 8px 12px;
+    margin: 0 5px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  
+  .pagination button:hover {
+    background-color: #0056b3;
+  }
+  
+  .pagination button.active {
+    background-color: #0056b3;
+  }
+  
+  .pagination button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  .dashboard-table td {
+    background-color: #f9f9f9;
+    position: relative; /* Make sure the delete button stays within the bounds of the table cell */
+  }
+  
+  .delete-button {
+    padding: 6px 12px;
+    color: #fff;
+    background-color: #ff4d4d;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    position: relative; /* Ensure it stays in the cell's flow */
+  }
+  
+  .delete-button:hover {
+    background-color: #e60000;
+  }
+  

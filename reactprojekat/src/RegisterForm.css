@@ -1,0 +1,80 @@
+:root {
+    --dark-brown: #544b3d;
+    --olive-green: #4e6e58;
+    --forest-green: #4c8577;
+    --light-teal: #a6ece0;
+    --mint-green: #7adfbb;
+  }
+  
+  body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--light-teal);
+    color: var(--dark-brown);
+  }
+  
+  .register-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: var(--light-teal);
+  }
+  
+  .register-form-section {
+    background-color: var(--olive-green);
+    padding: 40px;
+    border-radius: 10px;
+    color: white;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    text-align: center;
+  }
+  
+  .register-form-section h1 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+    text-align: left;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+  
+  .form-group input {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .cta-button {
+    background-color: var(--forest-green);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    margin-top: 20px;
+  }
+  
+  .cta-button:hover {
+    background-color: var(--olive-green);
+  }
+  
+  .error-message {
+    color: red;
+    margin-bottom: 20px;
+    font-weight: bold;
+  }
+  
